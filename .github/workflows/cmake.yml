@@ -5,11 +5,18 @@ name: CMake on multiple platforms
 on:
   push:
     branches: [ "master" ]
+    paths-ignore:
+      # Following paths make no effect to the compiled binaries.
+      # They should NOT trigger the build!
+      - .github/**
+      - .gitignore
+      - LICENSE
+      - README.md
+  # Keep a trigger here for manually launch a build.
+  workflow_dispatch:
 
 jobs:
   build:
-    runs-on: ${{ matrix.os }}
-
     strategy:
       # Set fail-fast to false to ensure that feedback is delivered for all matrix combinations. Consider changing this to true when your workflow is stable.
       fail-fast: false
@@ -21,17 +28,8 @@ jobs:
       #
       # To add more build types (Release, Debug, RelWithDebInfo, etc.) customize the build_type list.
       matrix:
-        os:
-          - windows-2022
-          - ubuntu-24.04
-          - macos-14
-          - macos-13
         build_type:
           - Release
-        c_compiler:
-          - cl
-          - gcc
-          - clang
         include:
           - os: windows-2022
             c_compiler: cl
@@ -45,25 +43,8 @@ jobs:
           - os: macos-13
             c_compiler: clang
             cpp_compiler: clang++
-        exclude:
-          - os: windows-2022
-            c_compiler: gcc
-          - os: windows-2022
-            c_compiler: clang
-          - os: ubuntu-24.04
-            c_compiler: cl
-          - os: ubuntu-24.04
-            c_compiler: clang
-          - os: macos-14
-            c_compiler: cl
-          - os: macos-14
-            c_compiler: gcc
-          - os: macos-13
-            c_compiler: cl
-          - os: macos-13
-            c_compiler: gcc
 
-
+    runs-on: ${{ matrix.os }}
 
     steps:
     - uses: actions/checkout@v4
